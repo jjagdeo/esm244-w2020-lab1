@@ -1,0 +1,100 @@
+---
+title: "Lab 1"
+author: "Jessica Jagdeo"
+date: "1/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here) #Package is good for people working on different systems because filepaths don't depend on slashes
+library(janitor)
+library(kableExtra)
+
+```
+
+Read in noaa_fisheries.csv data
+
+```{r, message = FALSE}
+
+us_landings <- read_csv(here("data", "noaa_fisheries.csv")) #Use here so that you can move upstream in filepaths and don't need slashes
+
+```
+
+Now, make a tidy version of the dataframe
+
+```{r}
+
+landings_tidy <- us_landings %>% 
+  clean_names() %>% 
+  mutate(state = str_to_lower(state), #str_to_lower() changes all strings in a column to lowercase; can also change to uppercase or sentence-case
+         afs_name = str_to_lower(afs_name),
+         dollars_num = parse_number(dollars_usd)) #parse_number() extracts only the number from a column if there are both numbers and characters within that column; located in the readr package
+
+```
+
+Get info for salmon:
+
+```{r}
+
+salmon_landings <- landings_tidy %>% 
+  mutate(afs_clean = str_remove(afs_name, pattern = "aggregate")) %>%  #str_remove() removes a character string throughout a column
+  filter(str_detect(afs_clean, pattern = "salmon")) %>% #str_detect() asks, does a pattern exist in a cell? If true, returns that cell. 
+  separate(afs_clean, into = c("group", "species"), sep = ",") #separate() separates a character string into different columns based on the separating delimiter (comma in this case)
+
+```
+
+Find some grouped summary data:
+
+Find annual total US landings and dollar values (summing across all states) for each type of salmon using group_by() and summarize()
+
+```{r}
+
+salmon_summary <- salmon_landings %>% 
+  group_by(year, species) %>% 
+  summarize(
+    tot_landings_pounds = sum(landings_pounds),
+    tot_value = sum(dollars_num)
+  )
+
+```
+
+Make a graph
+
+```{r}
+
+salmon_landings_graph <- ggplot(data = salmon_summary, 
+                                aes(x = year, y = tot_landings_pounds)) +
+  geom_line(aes(color = species)) +
+  theme_minimal()
+  
+
+salmon_landings_graph
+
+```
+
+Now, we'll export our graph with ggsave()
+
+```{r}
+
+ggsave(plot = salmon_landings_graph, 
+       here("figures", "us_salmon_jj.png"),
+       height = 5,
+       width = 8)
+
+```
+
+Make a nice kable table
+
+```{r}
+
+salmon_first_5 <- salmon_summary %>% 
+  head(5) 
+
+kable(salmon_first_5) %>% 
+kable_styling(bootstrap_options = "striped",
+              full_width = FALSE)
+```
+

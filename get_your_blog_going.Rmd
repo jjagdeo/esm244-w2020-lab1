@@ -70,6 +70,13 @@ new_site(theme = "gcushen/hugo-academic",
          theme_example = TRUE, 
          empty_dirs = TRUE,
          to_yaml = TRUE)
+
+new_site(theme = "devcows/hugo-universal-theme", 
+         sample = TRUE, 
+         theme_example = TRUE, 
+         empty_dirs = TRUE,
+         to_yaml = TRUE)
+
 ```
 
 It may take a few moments to pull the theme. Notice that it shows up in your "Viewer" tab - and you can also have it pop-out into a browser window!  
@@ -86,12 +93,12 @@ That means that all our updates are organized and put into the `public/` folder,
 ### Start customizing your site!
 
 - In the `config.toml` file, update the title
-- In `config/_default/params` set a new [theme](https://sourcethemes.com/academic/themes/)
+- Themes exist here: In `config/_default/params` set a new [theme](https://sourcethemes.com/academic/themes/) by using theme = "_"
 - In `content/home`:
-    - Set “hero” widget to `active = false` (don't delete)
+    - Set “hero” widget (top-most banner) to `active = false` (don't delete)
     - Set “demo” widget to `active = false` (don't delete)
     - A lot of changes made to individual sections in: content/home
-- In `content/authors/index.md`, update with your info & contact information
+- In `content/authors/admin/index.md`, update with your info & contact information
 - Update your picture: 
     - Save a professional picture (square cropped) of you as `avatar.jpg`
     - Copy and paste that into `content/authors/admin` to replace existing
